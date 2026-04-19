@@ -80,3 +80,18 @@ export const createOrderDocument = (orderData, orderId, totals) => {
     updatedAt: new Date(),
   };
 };
+
+//Status transition
+export const isValidStatusTransition = (currentStatus, newStatus) => {
+  const validTransition = {
+    pending: ["confirmed", "cancelled"],
+    confirmed: ["preparing", "cancelled"],
+    preparing: ["ready", "cancelled"],
+    ready: ["out_for_delivery", "cancelled"],
+    out_for_delivery: ["delivered"],
+    delivered: [],
+    cancelled: [],
+  };
+
+  return validTransition[currentStatus]?.includes(newStatus) || false;
+};

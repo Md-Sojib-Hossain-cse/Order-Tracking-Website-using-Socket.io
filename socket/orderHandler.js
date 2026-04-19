@@ -60,4 +60,16 @@ export const orderHandler = (io, socket) => {
       });
     }
   });
+
+  //cancel order
+  socket.on("cancelOrder", async (data, callback) => {
+    try {
+      const ordersCollection = await getCollection("orders");
+      const order = await ordersCollection.findOne({ orderId: data.orderId });
+
+      if (!order) {
+        return callback({ success: false, message: "Order not found" });
+      }
+    } catch (error) {}
+  });
 };
