@@ -70,7 +70,7 @@ export const createOrderDocument = (orderData, orderId, totals) => {
     statusHistory: [
       {
         status: "pending",
-        Timestamp: new Date(),
+        timestamp: new Date(),
         by: "customer",
         note: "order placed",
       },

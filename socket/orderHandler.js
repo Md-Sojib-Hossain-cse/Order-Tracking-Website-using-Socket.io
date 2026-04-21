@@ -70,6 +70,72 @@ export const orderHandler = (io, socket) => {
       if (!order) {
         return callback({ success: false, message: "Order not found" });
       }
-    } catch (error) {}
+
+      if (!["pending", "confirmed"].includes(order.status)) {
+        return callback({ success: false, message: "Cannot cancel the order" });
+      }
+
+      await ordersCollection.updateOne(
+        { orderId: data.orderId },
+        {
+          $set: { status: "cancelled", updatedAt: new Date() },
+          $push: {
+            statusHistory: {
+              status: "cancelled",
+              timestamp: new Date(),
+              by: socket.id,
+              note: data.reason || "cancelled by customer",
+            },
+          },
+        },
+      );
+
+      io.to(`order-${data.orderId}`).emit("orderCancelled", {
+        order: data.orderId,
+      });
+
+      io.to("admins").emit("orderCancelled", {
+        order: data.orderId,
+        customerName: data.customerName,
+      });
+
+      callback({ success: false });
+    } catch (error) {
+      console.error("Cancel order error", error);
+      callback({
+        success: false,
+        message: error.message || "Cancel order error",
+      });
+    }
+  });
+
+  //get my orders
+  socket.on("getMyOrders", async (data, callback) => {
+    try {
+      const ordersCollection = await getCollection("orders");
+      const orders = await ordersCollection
+        .find({
+          customerPhone: data.customerPhone,
+        })
+        .sort({ createdAt: -1 })
+        .limit(10)
+        .toArray();
+
+      callback({ success: true, orders });
+    } catch (error) {
+      console.error("get orders error", error);
+    }
+  });
+
+  //admin events
+  socket.on("adminLogin", async (data, callback) => {
+    try {
+      if (data.password !== process.env.password) {
+        return callback({ success: false, message: "credentials not m" });
+      }
+    } catch (error) {
+      console.log(error);
+      callback({ success: false, message: "Login failed" });
+    }
   });
 };
