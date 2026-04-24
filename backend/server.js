@@ -28,8 +28,6 @@ io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
   socket.emit("connected", {message: `User ${socket.id} connected`});
 
-  //orderid 
-  console.log(generateOrderId())
   // for handling the orders
   orderHandler(io, socket);
 });

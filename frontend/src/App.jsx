@@ -3,7 +3,7 @@ import "./App.css";
 function App() {
   return (
     <>
-      <h1>HomePage</h1>
+      <h1>{"This is socket.io client testing"}</h1>
     </>
   );
 }
