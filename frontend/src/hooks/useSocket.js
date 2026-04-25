@@ -6,32 +6,32 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 
 export const useSocket = () => {
   const socketRef = useRef(null);
-
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    //create socket connection
+    // Create socket connection
     socketRef.current = io(SOCKET_URL, {
       transports: ["websocket", "polling"],
     });
 
-    //connection event
+    // Connection event
     socketRef.current.on("connect", () => {
       setConnected(true);
-      console.log("connected to server :", socketRef.current.id);
+      console.log("✅ Connected to server:", socketRef.current.id);
     });
 
-    //disconnection event
+    // Disconnection event
     socketRef.current.on("disconnect", () => {
       setConnected(false);
-      console.log("disconnected from server..");
+      console.log("❌ Disconnected from server");
     });
 
+    // Server welcome message
     socketRef.current.on("connected", (data) => {
-      console.log("Server Message :", data.message);
+      console.log("📨 Server message:", data.message);
     });
 
-    //cleanup on unmount
+    // Cleanup on unmount
     return () => {
       if (socketRef.current) {
         socketRef.current.disconnect();
