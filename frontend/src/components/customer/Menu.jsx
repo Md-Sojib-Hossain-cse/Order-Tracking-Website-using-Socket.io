@@ -17,7 +17,7 @@ const Menu = ({ onAddToCart }) => {
           Welcome to FoodTrack 🍽️
         </h1>
         <p className="text-xl text-gray-600">
-          Order your favorite food and track it in real-time!
+          Order your favorite food and track it in real time!
         </p>
       </div>
 
