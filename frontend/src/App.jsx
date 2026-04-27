@@ -1,22 +1,23 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router';
-import { useSocket } from './hooks/useSocket';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router";
+import { useSocket } from "./hooks/useSocket";
 
 // Common Components
-import Notification from './components/common/Notification';
-import Header from './components/common/Header';
+import Notification from "./components/common/Notification";
+import Header from "./components/common/Header";
 
 // Customer Components
-import Menu from './components/customer/Menu';
-import Cart from './components/customer/Cart';
-import OrderForm from './components/customer/OrderForm';
-import OrderTracking from './components/customer/OrderTracking';
-import OrderHistory from './components/customer/OrderHistory';
+import Menu from "./components/customer/Menu";
+import Cart from "./components/customer/Cart";
+import OrderForm from "./components/customer/OrderForm";
+import OrderTracking from "./components/customer/OrderTracking";
+import OrderHistory from "./components/customer/OrderHistory";
 
 // Admin Components
-import AdminLogin from './components/admin/AdminLogin';
-import AdminDashboard from './components/admin/AdminDashboard';
+import AdminLogin from "./components/admin/AdminLogin";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import TrackOrder from "./components/customer/TrackOrder";
 
 function App() {
   const { socket, connected } = useSocket();
@@ -26,46 +27,48 @@ function App() {
 
   // Load cart from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem("cart");
     if (savedCart) {
       try {
         setCart(JSON.parse(savedCart));
       } catch (error) {
-        console.error('Failed to load cart:', error);
+        console.error("Failed to load cart:", error);
       }
     }
 
     // Check admin login status
-    const adminStatus = localStorage.getItem('isAdmin');
-    if (adminStatus === 'true') {
+    const adminStatus = localStorage.getItem("isAdmin");
+    if (adminStatus === "true") {
       setIsAdminLoggedIn(true);
     }
   }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
   // Show notification helper
-  const showNotification = (message, type = 'success') => {
+  const showNotification = (message, type = "success") => {
     setNotification({ message, type });
   };
 
   // Cart functions
   const addToCart = (item) => {
-    const existingItem = cart.find(cartItem => cartItem.id === item.id);
-    
+    const existingItem = cart.find((cartItem) => cartItem.id === item.id);
+
     if (existingItem) {
-      setCart(cart.map(cartItem =>
-        cartItem.id === item.id
-          ? { ...cartItem, quantity: cartItem.quantity + 1 }
-          : cartItem
-      ));
-      showNotification(`Added another ${item.name} to cart`, 'success');
+      setCart(
+        cart.map((cartItem) =>
+          cartItem.id === item.id
+            ? { ...cartItem, quantity: cartItem.quantity + 1 }
+            : cartItem,
+        ),
+      );
+      showNotification(`Added another ${item.name} to cart`, "success");
     } else {
       setCart([...cart, { ...item, quantity: 1 }]);
-      showNotification(`${item.name} added to cart`, 'success');
+      showNotification(`${item.name} added to cart`, "success");
     }
   };
 
@@ -75,20 +78,22 @@ function App() {
       return;
     }
 
-    setCart(cart.map(item =>
-      item.id === itemId ? { ...item, quantity: newQuantity } : item
-    ));
+    setCart(
+      cart.map((item) =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item,
+      ),
+    );
   };
 
   const removeFromCart = (itemId) => {
-    setCart(cart.filter(item => item.id !== itemId));
-    showNotification('Item removed from cart', 'info');
+    setCart(cart.filter((item) => item.id !== itemId));
+    showNotification("Item removed from cart", "info");
   };
 
   const clearCart = () => {
-    if (window.confirm('Are you sure you want to clear your cart?')) {
+    if (window.confirm("Are you sure you want to clear your cart?")) {
       setCart([]);
-      showNotification('Cart cleared', 'info');
+      showNotification("Cart cleared", "info");
     }
   };
 
@@ -98,9 +103,9 @@ function App() {
   };
 
   const handleAdminLogout = () => {
-    localStorage.removeItem('isAdmin');
+    localStorage.removeItem("isAdmin");
     setIsAdminLoggedIn(false);
-    showNotification('Logged out successfully', 'success');
+    showNotification("Logged out successfully", "success");
   };
 
   return (
@@ -174,6 +179,7 @@ function App() {
             element={
               <>
                 <Header cartCount={cart.length} connected={connected} />
+                <TrackOrder></TrackOrder>
                 <OrderHistory
                   socket={socket}
                   onShowNotification={showNotification}

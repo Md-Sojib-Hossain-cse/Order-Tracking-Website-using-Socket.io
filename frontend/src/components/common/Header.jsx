@@ -1,8 +1,13 @@
-import { Link, useNavigate } from 'react-router';
-import { useState } from 'react';
-import ConnectionStatus from './ConnectionStatus';
+import { Link, useNavigate } from "react-router";
+import { useState } from "react";
+import ConnectionStatus from "./ConnectionStatus";
 
-const Header = ({ cartCount = 0, showCart = true, showAdmin = true, connected }) => {
+const Header = ({
+  cartCount = 0,
+  showCart = true,
+  showAdmin = true,
+  connected,
+}) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -11,7 +16,10 @@ const Header = ({ cartCount = 0, showCart = true, showAdmin = true, connected })
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition">
+          <Link
+            to="/"
+            className="flex items-center gap-2 hover:opacity-80 transition"
+          >
             <span className="text-3xl">🍕</span>
             <div>
               <h1 className="text-xl font-bold">FoodTrack</h1>
@@ -19,12 +27,17 @@ const Header = ({ cartCount = 0, showCart = true, showAdmin = true, connected })
             </div>
           </Link>
 
+          {/* Navigation menu */}
+          <Link to="/orders" className="hidden md:flex font-semibold">
+            Orders
+          </Link>
+
           {/* Controls */}
           <div className="flex items-center gap-4">
             {/* Cart - Always Visible */}
             {showCart && (
               <button
-                onClick={() => navigate('/cart')}
+                onClick={() => navigate("/cart")}
                 className="relative hover:bg-blue-500 px-3 py-2 rounded-lg transition"
               >
                 <span className="text-2xl">🛒</span>
@@ -55,7 +68,7 @@ const Header = ({ cartCount = 0, showCart = true, showAdmin = true, connected })
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="md:hidden p-2 rounded-lg hover:bg-blue-500 transition text-2xl"
             >
-              {isMenuOpen ? '✕' : '☰'}
+              {isMenuOpen ? "✕" : "☰"}
             </button>
           </div>
         </div>
@@ -78,12 +91,24 @@ const Header = ({ cartCount = 0, showCart = true, showAdmin = true, connected })
                 <span>Admin Dashboard</span>
               </Link>
             )}
-            
+
             <button
-               onClick={() => { setIsMenuOpen(false); navigate('/'); }}
-               className="text-left px-4 py-3 hover:bg-gray-50 rounded-xl transition text-gray-600"
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/");
+              }}
+              className="text-left px-4 py-3 hover:bg-gray-50 rounded-xl transition text-gray-600"
             >
               Home
+            </button>
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                navigate("/orders");
+              }}
+              className="text-left px-4 py-3 hover:bg-gray-50 rounded-xl transition text-gray-600"
+            >
+              Orders
             </button>
           </div>
         )}

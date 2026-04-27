@@ -1,30 +1,30 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 const OrderHistory = ({ socket, onShowNotification }) => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [customerPhone, setCustomerPhone] = useState('');
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [showPhoneInput, setShowPhoneInput] = useState(true);
 
   const loadOrders = (phone) => {
     setLoading(true);
-    socket.emit('getMyOrders', { customerPhone: phone }, (response) => {
+    socket.emit("getMyOrders", { customerPhone: phone }, (response) => {
       setLoading(false);
       if (response.success) {
         setOrders(response.orders);
         setShowPhoneInput(false);
-        localStorage.setItem('customerPhone', phone);
+        localStorage.setItem("customerPhone", phone);
       } else {
-        onShowNotification('Failed to load orders', 'error');
+        onShowNotification("Failed to load orders", "error");
       }
     });
   };
 
   useEffect(() => {
-    const savedPhone = localStorage.getItem('customerPhone');
+    const savedPhone = localStorage.getItem("customerPhone");
     if (savedPhone) {
       setCustomerPhone(savedPhone);
       loadOrders(savedPhone);
@@ -36,7 +36,7 @@ const OrderHistory = ({ socket, onShowNotification }) => {
   const handlePhoneSubmit = (e) => {
     e.preventDefault();
     if (!customerPhone.trim()) {
-      onShowNotification('Please enter your phone number', 'error');
+      onShowNotification("Please enter your phone number", "error");
       return;
     }
     loadOrders(customerPhone);
@@ -44,17 +44,39 @@ const OrderHistory = ({ socket, onShowNotification }) => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pending' },
-      confirmed: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Confirmed' },
-      preparing: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Preparing' },
-      ready: { bg: 'bg-green-100', text: 'text-green-800', label: 'Ready' },
-      out_for_delivery: { bg: 'bg-purple-100', text: 'text-purple-800', label: 'On the Way' },
-      delivered: { bg: 'bg-green-100', text: 'text-green-800', label: 'Delivered' },
-      cancelled: { bg: 'bg-red-100', text: 'text-red-800', label: 'Cancelled' }
+      pending: {
+        bg: "bg-yellow-100",
+        text: "text-yellow-800",
+        label: "Pending",
+      },
+      confirmed: {
+        bg: "bg-blue-100",
+        text: "text-blue-800",
+        label: "Confirmed",
+      },
+      preparing: {
+        bg: "bg-orange-100",
+        text: "text-orange-800",
+        label: "Preparing",
+      },
+      ready: { bg: "bg-green-100", text: "text-green-800", label: "Ready" },
+      out_for_delivery: {
+        bg: "bg-purple-100",
+        text: "text-purple-800",
+        label: "On the Way",
+      },
+      delivered: {
+        bg: "bg-green-100",
+        text: "text-green-800",
+        label: "Delivered",
+      },
+      cancelled: { bg: "bg-red-100", text: "text-red-800", label: "Cancelled" },
     };
     const badge = badges[status] || badges.pending;
     return (
-      <span className={`px-3 py-1 rounded-full text-sm font-medium ${badge.bg} ${badge.text}`}>
+      <span
+        className={`px-3 py-1 rounded-full text-sm font-medium ${badge.bg} ${badge.text}`}
+      >
         {badge.label}
       </span>
     );
@@ -62,29 +84,36 @@ const OrderHistory = ({ socket, onShowNotification }) => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
-  const filteredOrders = filterStatus === 'all'
-    ? orders
-    : orders.filter(order => {
-        if (filterStatus === 'active') {
-          return ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery'].includes(order.status);
-        }
-        if (filterStatus === 'completed') {
-          return order.status === 'delivered';
-        }
-        if (filterStatus === 'cancelled') {
-          return order.status === 'cancelled';
-        }
-        return true;
-      });
+  const filteredOrders =
+    filterStatus === "all"
+      ? orders
+      : orders.filter((order) => {
+          if (filterStatus === "active") {
+            return [
+              "pending",
+              "confirmed",
+              "preparing",
+              "ready",
+              "out_for_delivery",
+            ].includes(order.status);
+          }
+          if (filterStatus === "completed") {
+            return order.status === "delivered";
+          }
+          if (filterStatus === "cancelled") {
+            return order.status === "cancelled";
+          }
+          return true;
+        });
 
   if (showPhoneInput) {
     return (
@@ -93,8 +122,12 @@ const OrderHistory = ({ socket, onShowNotification }) => {
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="text-center mb-6">
               <div className="text-6xl mb-4">📱</div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">View Your Orders</h2>
-              <p className="text-gray-600">Enter your phone number to see your order history</p>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                View Your Orders
+              </h2>
+              <p className="text-gray-600">
+                Enter your phone number to see your order history
+              </p>
             </div>
 
             <form onSubmit={handlePhoneSubmit} className="space-y-4">
@@ -120,7 +153,7 @@ const OrderHistory = ({ socket, onShowNotification }) => {
 
               <button
                 type="button"
-                onClick={() => navigate('/')}
+                onClick={() => navigate("/")}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-medium transition"
               >
                 Back to Menu
@@ -151,7 +184,7 @@ const OrderHistory = ({ socket, onShowNotification }) => {
           <h1 className="text-3xl font-bold text-gray-800">Order History</h1>
           <button
             onClick={() => {
-              localStorage.removeItem('customerPhone');
+              localStorage.removeItem("customerPhone");
               setShowPhoneInput(true);
               setOrders([]);
             }}
@@ -164,18 +197,38 @@ const OrderHistory = ({ socket, onShowNotification }) => {
         {/* Filter Tabs */}
         <div className="flex flex-wrap gap-3 mb-6">
           {[
-            { key: 'all', label: 'All Orders', count: orders.length },
-            { key: 'active', label: 'Active', count: orders.filter(o => ['pending', 'confirmed', 'preparing', 'ready', 'out_for_delivery'].includes(o.status)).length },
-            { key: 'completed', label: 'Completed', count: orders.filter(o => o.status === 'delivered').length },
-            { key: 'cancelled', label: 'Cancelled', count: orders.filter(o => o.status === 'cancelled').length }
-          ].map(tab => (
+            { key: "all", label: "All Orders", count: orders.length },
+            {
+              key: "active",
+              label: "Active",
+              count: orders.filter((o) =>
+                [
+                  "pending",
+                  "confirmed",
+                  "preparing",
+                  "ready",
+                  "out_for_delivery",
+                ].includes(o.status),
+              ).length,
+            },
+            {
+              key: "completed",
+              label: "Completed",
+              count: orders.filter((o) => o.status === "delivered").length,
+            },
+            {
+              key: "cancelled",
+              label: "Cancelled",
+              count: orders.filter((o) => o.status === "cancelled").length,
+            },
+          ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setFilterStatus(tab.key)}
               className={`px-6 py-2 rounded-lg font-medium transition ${
                 filterStatus === tab.key
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-700 hover:bg-gray-100"
               }`}
             >
               {tab.label} ({tab.count})
@@ -187,10 +240,14 @@ const OrderHistory = ({ socket, onShowNotification }) => {
         {filteredOrders.length === 0 ? (
           <div className="bg-white rounded-xl shadow-lg p-12 text-center">
             <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">No Orders Found</h3>
-            <p className="text-gray-600 mb-6">You haven't placed any orders yet</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              No Orders Found
+            </h3>
+            <p className="text-gray-600 mb-6">
+              You haven't placed any orders yet
+            </p>
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium"
             >
               Order Now
@@ -198,7 +255,7 @@ const OrderHistory = ({ socket, onShowNotification }) => {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredOrders.map(order => (
+            {filteredOrders.map((order) => (
               <div
                 key={order.orderId}
                 className="bg-white rounded-xl shadow-md hover:shadow-lg transition p-6 cursor-pointer"
@@ -207,14 +264,22 @@ const OrderHistory = ({ socket, onShowNotification }) => {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-bold text-gray-800">{order.orderId}</h3>
+                      <h3 className="text-lg font-bold text-gray-800">
+                        {order.orderId}
+                      </h3>
                       {getStatusBadge(order.status)}
                     </div>
-                    <p className="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
+                    <p className="text-sm text-gray-600">
+                      {formatDate(order.createdAt)}
+                    </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-blue-600">${order.totalAmount.toFixed(2)}</p>
-                    <p className="text-sm text-gray-600">{order.items.length} items</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      ${order.totalAmount.toFixed(2)}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {order.items.length} items
+                    </p>
                   </div>
                 </div>
 
@@ -222,8 +287,12 @@ const OrderHistory = ({ socket, onShowNotification }) => {
                   {order.items.slice(0, 3).map((item, idx) => (
                     <span key={idx} className="flex items-center gap-1">
                       <span>{item.image}</span>
-                      <span>{item.quantity}x {item.name}</span>
-                      {idx < Math.min(order.items.length - 1, 2) && <span>•</span>}
+                      <span>
+                        {item.quantity}x {item.name}
+                      </span>
+                      {idx < Math.min(order.items.length - 1, 2) && (
+                        <span>•</span>
+                      )}
                     </span>
                   ))}
                   {order.items.length > 3 && (
@@ -233,9 +302,9 @@ const OrderHistory = ({ socket, onShowNotification }) => {
 
                 <div className="flex justify-between items-center pt-3 border-t">
                   <span className="text-sm text-gray-600">
-                    {order.estimatedTime && !['delivered', 'cancelled'].includes(order.status) && (
-                      `Estimated: ${order.estimatedTime} min`
-                    )}
+                    {order.estimatedTime &&
+                      !["delivered", "cancelled"].includes(order.status) &&
+                      `Estimated: ${order.estimatedTime} min`}
                   </span>
                   <span className="text-blue-600 font-medium text-sm">
                     View Details →
