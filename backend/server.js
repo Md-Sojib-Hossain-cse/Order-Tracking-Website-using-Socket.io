@@ -42,6 +42,14 @@ app.use(express.urlencoded({ extended: true }));
 // REST API ROUTES
 // ==========================================
 
+app.get("/", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "Server is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.json({
